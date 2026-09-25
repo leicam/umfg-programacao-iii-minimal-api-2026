@@ -13,4 +13,7 @@ public sealed class Lembrete
         ArgumentNullException.ThrowIfNullOrWhiteSpace(descricao);
         Descricao = descricao;
     }
+
+    internal void SetAtivo(bool isAtivo) => IsAtivo = isAtivo;    
+    internal void Update() => DataAtualizacao = DateTime.Now;    
 }
