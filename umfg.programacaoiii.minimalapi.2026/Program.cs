@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using umfg.programacaoiii.minimalapi._2026.Contexto;
+using umfg.programacaoiii.minimalapi._2026.DTO;
 using umfg.programacaoiii.minimalapi._2026.Entidades;
 
 namespace umfg.programacaoiii.minimalapi._2026;
@@ -42,6 +43,58 @@ public class Program
             return await contexto.Lembrete.Where(x => x.IsAtivo).ToListAsync();            
         });
 
+        app.MapGet("/transacoes", async ([AsParameters] LembreteQueryDTO.LembreteQueryRequestDTO dto, MySqlContexto contexto) =>
+        {
+            if (dto.NumeroPagina <= 0 || dto.TamanhoPagina <= 0)
+                return Results.BadRequest("Página e tamanho da página são obrigatórios.");
+
+            var query = contexto.Lembrete
+                .AsNoTracking()
+                .Where(x => x.IsAtivo);
+
+            //busca por descrição com tratamento de caracteres especiais para LIKE
+            if (!string.IsNullOrWhiteSpace(dto.Descricao))
+            {
+                var termo = dto.Descricao.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
+                query = query.Where(x => EF.Functions.Like(x.Descricao, $"%{termo}%"));
+            }
+
+            // Filtros opcionais
+            if (dto.DataCadastroInicial > DateTime.MinValue)
+                query = query.Where(x => x.DataCadastro >= dto.DataCadastroInicial);
+
+            if (dto.DataCadastroFinal < DateTime.MaxValue)
+                query = query.Where(x => x.DataCadastro < dto.DataCadastroFinal.Date.AddDays(1)); // inclui o dia inteiro
+
+            if (dto.DataAtualizacaoInicial > DateTime.MinValue)
+                query = query.Where(x => x.DataAtualizacao >= dto.DataAtualizacaoInicial);
+
+            if (dto.DataAtualizacaoFinal < DateTime.MaxValue)
+                query = query.Where(x => x.DataAtualizacao < dto.DataAtualizacaoFinal.Date.AddDays(1)); // inclui o dia inteiro
+
+            //ordenar sempre do mais recente para o mais antigo
+            if (dto.Direcao.ToUpper() != "ASC" && dto.Direcao.ToUpper() != "DESC")
+                dto.Direcao = "DESC";
+
+            //ordenação
+            query = dto.Direcao.ToUpper() == "DESC" ? query.OrderByDescending(x => dto.Ordem) : query.OrderBy(x => dto.Ordem);
+
+            // paginação
+            var pular = (dto.NumeroPagina - 1) * dto.TamanhoPagina;
+            var lembretes = await query.Skip(pular).Take(dto.TamanhoPagina).ToListAsync();
+            var total = await query.CountAsync();
+
+            var resultado = new LembreteQueryDTO.LembreteQueryResponseDTO()
+            {
+                Total = await query.CountAsync(),
+                NumeroPagina = dto.NumeroPagina,
+                TamanhoPagina = dto.TamanhoPagina,
+                Lembretes = lembretes,
+            };
+
+            return Results.Ok(resultado);
+        });        
+
         app.MapDelete("/lembretes/{id}", async (string id, MySqlContexto contexto) =>
         {
             var lembrete = await contexto.Lembrete.FindAsync(Guid.Parse(id));
@@ -57,6 +110,22 @@ public class Program
             await contexto.SaveChangesAsync();
 
             return Results.NoContent();
+        });
+
+        app.MapPut("/lembretes/{id}", async (string id, LembreteDTO dto, MySqlContexto contexto) =>
+        {
+            var lembreteExistente = await contexto.Lembrete.FindAsync(Guid.Parse(id));
+
+            if (lembreteExistente is null)
+                return Results.NotFound();
+
+            lembreteExistente.SetDescricao(dto.Descricao);
+            lembreteExistente.Update();
+
+            contexto.Lembrete.Update(lembreteExistente);
+            await contexto.SaveChangesAsync();
+
+            return Results.Ok(lembreteExistente);
         });
 
         //aqui habilitamos as funcionalidades da api

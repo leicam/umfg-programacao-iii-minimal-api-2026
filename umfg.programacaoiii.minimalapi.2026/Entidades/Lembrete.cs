@@ -14,6 +14,7 @@ public sealed class Lembrete
         Descricao = descricao;
     }
 
+    internal void SetDescricao(string descricao) => Descricao = descricao ?? throw new ArgumentNullException(nameof(descricao));
     internal void SetAtivo(bool isAtivo) => IsAtivo = isAtivo;    
     internal void Update() => DataAtualizacao = DateTime.Now;    
 }
