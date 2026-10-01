@@ -6,20 +6,18 @@ using umfg.programacaoiii.minimalapi._2026.Entidades;
 namespace umfg.programacaoiii.minimalapi._2026;
 
 public class Program
-{
-    private const string _connectionString = 
-        "Server=localhost;Port=3308;Database=umfg_lembrete;Uid=root;Pwd=root;";
-
+{    
     //método de startup do projeto
     public static void Main(string[] args)
     {
         //variavel padrão do .net permite definir as caracteristicas que a api irá ter
         //ex: autenticação e autorização via JWT / qual banco de dados
         var builder = WebApplication.CreateBuilder(args);
+        var connectionString = builder.Configuration["ConnectionString"] ?? string.Empty;
 
         //aqui configuramos a conexão da API com o banco de dados
         builder.Services
-            .AddDbContext<MySqlContexto>(options => options.UseMySQL(_connectionString));
+            .AddDbContext<MySqlContexto>(options => options.UseMySQL(connectionString));
 
         //aqui a aplicação é construída
         var app = builder.Build();
@@ -34,6 +32,9 @@ public class Program
 
         app.MapGet("/lembretes/{id}", async (string id, MySqlContexto contexto) =>
         {
+            if (string.IsNullOrWhiteSpace(id))
+                return Results.BadRequest("id invalido!");
+
             return await contexto.Lembrete.FirstOrDefaultAsync(x => x.Id == Guid.Parse(id) && x.IsAtivo) 
             is Lembrete lembrete ? Results.Ok(lembrete) : Results.NotFound();
         });
@@ -43,7 +44,7 @@ public class Program
             return await contexto.Lembrete.Where(x => x.IsAtivo).ToListAsync();            
         });
 
-        app.MapGet("/transacoes", async ([AsParameters] LembreteQueryDTO.LembreteQueryRequestDTO dto, MySqlContexto contexto) =>
+        app.MapGet("/lembretes/filtro", async ([AsParameters] LembreteQueryDTO.LembreteQueryRequestDTO dto, MySqlContexto contexto) =>
         {
             if (dto.NumeroPagina <= 0 || dto.TamanhoPagina <= 0)
                 return Results.BadRequest("Página e tamanho da página são obrigatórios.");
