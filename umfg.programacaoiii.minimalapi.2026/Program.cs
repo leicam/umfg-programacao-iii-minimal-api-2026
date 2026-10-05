@@ -19,6 +19,19 @@ public class Program
         builder.Services
             .AddDbContext<MySqlContexto>(options => options.UseMySQL(connectionString));
 
+        //implementacao do CORS para permitir que a aplicação frontend acesse a API (localhost)
+        //no mundo real, restrinja o acesso apenas para o dominio do frontend conhecido. Ex.: .WithOrigins("https://app.empresa.com.br")
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("Frontend", policy =>
+            {
+                policy
+                    .AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            });
+        });
+
         //aqui a aplicação é construída
         var app = builder.Build();
 
@@ -131,6 +144,9 @@ public class Program
 
         //aqui habilitamos as funcionalidades da api
         app.UseHttpsRedirection();
+
+        //habilitar o uso da regra de CORS
+        app.UseCors("Frontend");
 
         //a api é iniciada de fato
         app.Run();
