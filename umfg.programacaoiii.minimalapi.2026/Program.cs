@@ -118,8 +118,8 @@ public class Program
                                     table.ColumnsDefinition(columns =>
                                     {
                                         columns.RelativeColumn();
-                                        columns.ConstantColumn(80);
-                                        columns.ConstantColumn(80);
+                                        columns.ConstantColumn(110);
+                                        columns.ConstantColumn(110);
                                         columns.ConstantColumn(80);
                                     });
 
@@ -133,10 +133,10 @@ public class Program
 
                                     foreach (var lembrete in lembretes)
                                     {
-                                        table.Cell().Text(lembrete.Descricao);
-                                        table.Cell().Text(lembrete.DataCadastro.ToString("dd/MM/yyyy hh:mm:ss"));
-                                        table.Cell().Text(lembrete.DataAtualizacao.ToString("dd/MM/yyyy hh:mm:ss"));
-                                        table.Cell().Text(lembrete.IsAtivo ? "ATIVO" : "INATIVO");
+                                        table.Cell().Text(lembrete.Descricao).FontSize(10);
+                                        table.Cell().Text(lembrete.DataCadastro.ToString("dd/MM/yyyy hh:mm:ss")).FontSize(10);
+                                        table.Cell().Text(lembrete.DataAtualizacao.ToString("dd/MM/yyyy hh:mm:ss")).FontSize(10);
+                                        table.Cell().Text(lembrete.IsAtivo ? "ATIVO" : "INATIVO").FontSize(10).FontColor(lembrete.IsAtivo ? Color.FromHex("#00FF00") : Color.FromHex("#FF0000"));
                                     }
                                 });
                         });
