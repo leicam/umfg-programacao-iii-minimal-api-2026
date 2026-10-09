@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace umfg.programacaoiii.minimalapi._2026.Migrations
 {
     /// <inheritdoc />
-    public partial class Versao_1_0_0 : Migration
+    public partial class MigrationUnificada_1_0_0 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

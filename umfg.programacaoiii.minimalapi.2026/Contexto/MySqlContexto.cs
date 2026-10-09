@@ -22,7 +22,7 @@ public sealed class MySqlContexto : DbContext
         base.OnModelCreating(modelBuilder);
 
 		modelBuilder.Entity<Lembrete>().HasKey(x => x.Id);
-		modelBuilder.Entity<Lembrete>().Property(x => x.Descricao).IsRequired();
+		modelBuilder.Entity<Lembrete>().Property(x => x.Descricao).HasMaxLength(500).IsRequired();
 		modelBuilder.Entity<Lembrete>().Property(x => x.DataCadastro).IsRequired();
 		modelBuilder.Entity<Lembrete>().Property(x => x.DataAtualizacao).IsRequired();
 		modelBuilder.Entity<Lembrete>().Property(x => x.IsAtivo).IsRequired();

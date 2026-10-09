@@ -11,8 +11,8 @@ using umfg.programacaoiii.minimalapi._2026.Contexto;
 namespace umfg.programacaoiii.minimalapi._2026.Migrations
 {
     [DbContext(typeof(MySqlContexto))]
-    [Migration("20260925003227_Versao_1_0_0")]
-    partial class Versao_1_0_0
+    [Migration("20261008224250_MigrationUnificada_1_2_0")]
+    partial class MigrationUnificada_1_2_0
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,7 +36,8 @@ namespace umfg.programacaoiii.minimalapi._2026.Migrations
 
                     b.Property<string>("Descricao")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
 
                     b.Property<bool>("IsAtivo")
                         .HasColumnType("tinyint(1)");

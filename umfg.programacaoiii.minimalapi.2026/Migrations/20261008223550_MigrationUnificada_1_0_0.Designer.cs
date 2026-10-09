@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using umfg.programacaoiii.minimalapi._2026.Contexto;
 
@@ -10,9 +11,11 @@ using umfg.programacaoiii.minimalapi._2026.Contexto;
 namespace umfg.programacaoiii.minimalapi._2026.Migrations
 {
     [DbContext(typeof(MySqlContexto))]
-    partial class MySqlContextoModelSnapshot : ModelSnapshot
+    [Migration("20261008223550_MigrationUnificada_1_0_0")]
+    partial class MigrationUnificada_1_0_0
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,8 +36,7 @@ namespace umfg.programacaoiii.minimalapi._2026.Migrations
 
                     b.Property<string>("Descricao")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("IsAtivo")
                         .HasColumnType("tinyint(1)");
